@@ -2,21 +2,21 @@
 NGINX_STATUS=$1
 URL="http://127.0.0.1:80/nginx_status"
 CACHEFILE="/tmp/nginx_status.txt"
-CMD="/usr/bin/cur ${URL}" 
+CMD="/usr/bin/curl ${URL}" 
 
 if [ ! -f ${CACHEFILE} ];then
-   ${CMD} >${CACHEFILE} > /dev/null 2>&1
+   ${CMD} >${CACHEFILE} 2>/dev/null 
 fi
  
 #Check and run the scripe
 TIMEFLM=$(stat -c %Y $CACHEFILE)
 TIMENOW=$(date +%s)
 
-if [ $(expr ${TIMENOW} - ${TIMEFLM}) -gt 0 ];then
+if [ $(expr ${TIMENOW} - ${TIMEFLM}) -gt 60 ];then
    rm -f ${CACHEFILE}
 fi
 if [ ! -f ${CACHEFILE} ];then
-    ${CMD} >${CACHEFILE} > /dev/null 2>&1
+    ${CMD} >${CACHEFILE} 2>/dev/null 
 fi
 
 nginx_ping(){
@@ -24,22 +24,22 @@ nginx_ping(){
 }
 
 nginx_active(){
-      grep 'Active' ${CACHEFILE}|awk '{print ${NF}}'
+      grep 'Active' ${CACHEFILE}|awk '{print $NF}'
       exit 0;
 }
 
 nginx_reading(){
-      grep 'Reading' ${CACHEFILE}|awk '{print ${NF}}'
+      grep 'Reading' ${CACHEFILE}|awk '{print $NF}'
       exit 0;
 }
 
 nginx_writing(){
-      grep 'Writing' ${CACHEFILE}|awk '{print ${NF}}'
+      grep 'Writing' ${CACHEFILE}|awk '{print $NF}'
       exit 0;
 }
 
 nginx_waiting(){
-      grep 'Waiting' ${CACHEFILE}|awk '{print ${NF}}'
+      grep 'Waiting' ${CACHEFILE}|awk '{print $NF}'
       exit 0;
 }
 
